@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aba Banker's League Registration Portal</title>
+    <title>Aba Banker's League | Registration Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -14,6 +14,9 @@
         .neon-text { text-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6; }
         .id-card-print { width: 210mm; background: white; color: black; display: none; }
         .page-break { page-break-after: always; height: 297mm; position: relative; overflow: hidden; }
+        input::file-selector-button {
+            background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 10px;
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -33,7 +36,7 @@
                         <label class="text-[10px] text-gray-400 ml-1 uppercase">Coordinator Passport Photo</label>
                         <input type="file" id="coord-photo" accept="image/*" class="w-full text-xs text-gray-400 bg-gray-800 p-2 rounded border border-gray-700">
                     </div>
-                    <button onclick="registerCoordinator()" class="w-full bg-blue-600 hover:bg-blue-500 p-3 rounded font-bold transition">Register & Open Dashboard</button>
+                    <button id="btn-register" onclick="registerCoordinator()" class="w-full bg-blue-600 hover:bg-blue-500 p-3 rounded font-bold transition">Register & Open Dashboard</button>
                     <p class="text-center text-sm mt-4 text-gray-400">Already registered? <button onclick="toggleAuth(false)" class="text-blue-400 font-bold">Login with Team Name</button></p>
                 </div>
             </div>
@@ -42,7 +45,7 @@
             <div id="login-form" class="hidden">
                 <p class="text-gray-400 text-sm mb-4 text-center">Access your team dashboard</p>
                 <div class="space-y-4">
-                    <input type="text" id="login-team" placeholder="Enter Team Name" class="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:outline-none focus:border-green-500 text-white">
+                    <input type="text" id="login-team" placeholder="Enter Registered Team Name" class="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:outline-none focus:border-green-500 text-white">
                     <button onclick="login()" class="w-full bg-green-600 hover:bg-green-500 p-3 rounded font-bold transition">Access Dashboard</button>
                     <p class="text-center text-sm mt-4 text-gray-400">Need to register? <button onclick="toggleAuth(true)" class="text-blue-400 font-bold">Create Team</button></p>
                 </div>
@@ -54,7 +57,7 @@
     <div id="dashboard" class="hidden min-h-screen">
         <nav class="bg-gray-900 p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 z-50">
             <div class="flex items-center gap-3">
-                <img id="dash-coord-img" class="w-12 h-12 rounded-full border-2 border-blue-500 object-cover bg-gray-700" src="" alt="Coord">
+                <img id="dash-coord-img" class="w-12 h-12 rounded-full border-2 border-blue-500 object-cover bg-gray-700" src="" alt="">
                 <div>
                     <h2 id="dash-team-name" class="font-bold text-blue-400 leading-none"></h2>
                     <p id="dash-coord-name" class="text-[10px] text-gray-400 uppercase tracking-widest mt-1"></p>
@@ -104,15 +107,15 @@
                         <input type="file" id="p-photo" accept="image/*" class="w-full text-xs bg-gray-800 p-2 rounded">
                     </div>
                     <div class="space-y-1">
-                        <label class="text-xs text-gray-400 uppercase font-bold">Bank Staff ID (Verification)</label>
+                        <label class="text-xs text-gray-400 uppercase font-bold">Bank Staff ID</label>
                         <input type="file" id="p-bankid" accept="image/*" class="w-full text-xs bg-gray-800 p-2 rounded">
                     </div>
                 </div>
-                <button onclick="registerPlayer()" class="mt-6 w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold transition shadow-lg">Submit</button>
+                <button id="btn-add-player" onclick="registerPlayer()" class="mt-6 w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold transition shadow-lg">Submit Registration</button>
             </div>
 
             <!-- View: Squad List -->
-            <div id="view-players" class="view-section glass p-6 rounded-2xl hidden">
+            <div id="view-players" class="view-section glass p-6 rounded-2xl">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
@@ -131,16 +134,11 @@
 
             <!-- View: Modalities -->
             <div id="view-modalities" class="view-section glass p-6 rounded-2xl hidden">
-                <h3 class="text-2xl font-bold mb-6 text-blue-400">Tournament Modalities & Rules</h3>
-                <div class="prose prose-invert max-w-none text-gray-300 space-y-4">
-                    <p class="font-bold text-white">1. Eligibility:</p>
-                    <p>Only confirmed staff members of registered banks in Aba are eligible to play. No "mercenaries" or external players allowed.</p>
-                    <p class="font-bold text-white">2. Squad Composition:</p>
-                    <p>Each team is allowed a maximum of 22 registered players. Only players with a valid, system-generated ID card and staff ID verification are permitted on the field.</p>
-                    <p class="font-bold text-white">3. Verification:</p>
-                    <p>All players must undergo physical verification on match days using the QR code on their generated ID cards.</p>
-                    <p class="font-bold text-white">4. Discipline:</p>
-                    <p>Yellow and Red card fines apply. Any form of violent conduct will lead to immediate disqualification of the player and a potential team ban.</p>
+                <h3 class="text-2xl font-bold mb-6 text-blue-400">Tournament Rules</h3>
+                <div class="prose prose-invert max-w-none text-gray-300 space-y-4 text-sm">
+                    <p><b class="text-white">1. Eligibility:</b> Staff members of Aba banks only. No external players.</p>
+                    <p><b class="text-white">2. IDs:</b> Players must present digital or printed system IDs at every match.</p>
+                    <p><b class="text-white">3. Squad:</b> Maximum of 22 players per team.</p>
                 </div>
             </div>
 
@@ -162,16 +160,44 @@
         </div>
     </div>
 
-    <!-- PRINT TEMPLATE (Hidden from UI, used by PDF engine) -->
+    <!-- PRINT CONTAINER -->
     <div id="id-card-container" class="id-card-print">
-        <div id="printable-content">
-            <!-- Content dynamically generated here -->
-        </div>
+        <div id="printable-content"></div>
     </div>
 
     <script>
         let currentCoordinator = null;
-        let APP_DATA = JSON.parse(localStorage.getItem('abl_v2_data')) || { coordinators: [] };
+        let APP_DATA = JSON.parse(localStorage.getItem('abl_v3_data')) || { coordinators: [] };
+
+        // --- HELPER: IMAGE COMPRESSION ---
+        // This handles "all sizes" by resizing large images before saving
+        async function processImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compresses to 70% quality
+                    };
+                };
+            });
+        }
 
         function toggleAuth(showReg) {
             document.getElementById('reg-form').classList.toggle('hidden', !showReg);
@@ -181,32 +207,21 @@
         async function registerCoordinator() {
             const name = document.getElementById('coord-name').value.trim();
             const team = document.getElementById('team-name').value.trim();
-            const photoFile = document.getElementById('coord-photo').files[0];
+            const file = document.getElementById('coord-photo').files[0];
 
-            if (!name || !team || !photoFile) {
-                return alert("Coordinator Name, Team Name, and Passport Photo are required.");
-            }
+            if (!name || !team || !file) return alert("Please fill all fields");
 
-            // Uniqueness Check
-            const exists = APP_DATA.coordinators.some(c => c.team.toLowerCase() === team.toLowerCase());
-            if (exists) return alert("This team name is already registered.");
+            const btn = document.getElementById('btn-register');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
 
-            try {
-                const photoBase64 = await toBase64(photoFile);
-                const newCoord = {
-                    id: Date.now(),
-                    name, team,
-                    photo: photoBase64,
-                    players: []
-                };
-
-                APP_DATA.coordinators.push(newCoord);
-                saveData();
-                currentCoordinator = newCoord;
-                initDashboard();
-            } catch (err) {
-                alert("Error processing photo.");
-            }
+            const photo = await processImage(file);
+            const newCoord = { id: Date.now(), name, team, photo, players: [] };
+            
+            APP_DATA.coordinators.push(newCoord);
+            saveData();
+            currentCoordinator = newCoord;
+            initDashboard();
         }
 
         function login() {
@@ -217,19 +232,16 @@
                 currentCoordinator = found;
                 initDashboard();
             } else {
-                alert("Team not found. Please register first.");
+                alert("Team not found.");
             }
         }
 
         function initDashboard() {
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
-            
             updateHeader();
-            showView('players');
             renderPlayers();
-
-            // Prep Settings fields
+            showView('players');
             document.getElementById('edit-team-name').value = currentCoordinator.team;
             document.getElementById('edit-coord-name').value = currentCoordinator.name;
         }
@@ -246,57 +258,58 @@
         }
 
         async function registerPlayer() {
-            if (currentCoordinator.players.length >= 22) return alert("Squad limit reached (22 players max).");
-
+            if (currentCoordinator.players.length >= 22) return alert("Squad full.");
+            
+            const btn = document.getElementById('btn-add-player');
             const name = document.getElementById('p-name').value.trim();
             const bank = document.getElementById('p-bank').value.trim();
-            const phone = document.getElementById('p-phone').value.trim();
-            const job = document.getElementById('p-wing').value.trim();
-            const photo = document.getElementById('p-photo').files[0];
-            const bankId = document.getElementById('p-bankid').files[0];
+            const photoFile = document.getElementById('p-photo').files[0];
+            const idFile = document.getElementById('p-bankid').files[0];
 
-            if (!name || !bank || !photo || !bankId) return alert("Please fill all fields and upload both images.");
+            if(!name || !photoFile || !idFile) return alert("Missing fields");
+
+            btn.innerText = "Saving Player...";
+            btn.disabled = true;
 
             const playerObj = {
                 id: Date.now(),
-                name, bank, phone, job,
+                name, bank,
+                phone: document.getElementById('p-phone').value,
+                job: document.getElementById('p-wing').value,
                 playerNum: `ABL-${currentCoordinator.team.substring(0,3).toUpperCase()}-${(currentCoordinator.players.length + 1).toString().padStart(3, '0')}`,
-                photo: await toBase64(photo),
-                bankIdCard: await toBase64(bankId)
+                photo: await processImage(photoFile),
+                bankIdCard: await processImage(idFile)
             };
 
             currentCoordinator.players.push(playerObj);
             saveData();
-            alert("Player added!");
             renderPlayers();
             showView('players');
+            btn.innerText = "Submit Registration";
+            btn.disabled = false;
             
-            // Clear inputs
-            document.querySelectorAll('#view-register input').forEach(i => i.type === 'file' ? i.value = '' : i.value = '');
+            // Reset fields
+            document.querySelectorAll('#view-register input').forEach(i => i.value = '');
         }
 
         function renderPlayers() {
             const list = document.getElementById('player-list');
             document.getElementById('player-count').innerText = currentCoordinator.players.length;
-            list.innerHTML = '';
-
-            currentCoordinator.players.forEach(p => {
-                list.innerHTML += `
-                    <tr class="border-b border-gray-800 hover:bg-white/5 transition">
-                        <td class="p-3 font-mono text-blue-400 text-sm">${p.playerNum}</td>
-                        <td class="p-3 font-bold">${p.name}</td>
-                        <td class="p-3 text-sm">${p.job}</td>
-                        <td class="p-3 text-gray-400 text-xs">${p.bank}</td>
-                        <td class="p-3 text-right space-x-2">
-                            <button onclick="deletePlayer(${p.id})" class="text-red-500 hover:text-red-300 text-xs font-bold uppercase">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
+            list.innerHTML = currentCoordinator.players.map(p => `
+                <tr class="border-b border-gray-800 hover:bg-white/5 transition">
+                    <td class="p-3 font-mono text-blue-400 text-sm">${p.playerNum}</td>
+                    <td class="p-3 font-bold">${p.name}</td>
+                    <td class="p-3 text-sm">${p.job}</td>
+                    <td class="p-3 text-gray-400 text-xs">${p.bank}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="deletePlayer(${p.id})" class="text-red-500 hover:text-red-300 font-bold uppercase text-[10px]">Remove</button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
         function deletePlayer(id) {
-            if(confirm("Remove this player from the squad?")) {
+            if(confirm("Remove player?")) {
                 currentCoordinator.players = currentCoordinator.players.filter(p => p.id !== id);
                 saveData();
                 renderPlayers();
@@ -304,105 +317,48 @@
         }
 
         function updateSettings() {
-            const newTeamName = document.getElementById('edit-team-name').value.trim();
-            const newCoordName = document.getElementById('edit-coord-name').value.trim();
-
-            if(!newTeamName || !newCoordName) return alert("Fields cannot be empty.");
-
-            currentCoordinator.team = newTeamName;
-            currentCoordinator.name = newCoordName;
+            currentCoordinator.team = document.getElementById('edit-team-name').value;
+            currentCoordinator.name = document.getElementById('edit-coord-name').value;
             saveData();
             updateHeader();
-            alert("Settings updated successfully.");
+            alert("Updated!");
         }
 
-        async function bulkPrint() {
-            if (currentCoordinator.players.length === 0) return alert("No players to print.");
-            
-            const printArea = document.getElementById('printable-content');
-            printArea.innerHTML = '';
-            
-            alert("Preparing PDF for " + currentCoordinator.players.length + " players. Please wait...");
+        function bulkPrint() {
+            if (currentCoordinator.players.length === 0) return alert("No players.");
+            const container = document.getElementById('printable-content');
+            container.innerHTML = '';
 
-            for (let player of currentCoordinator.players) {
-                const page = document.createElement('div');
-                page.className = 'page-break p-10 flex flex-col items-center bg-white';
-                page.innerHTML = `
-                    <div class="flex justify-between w-full items-center mb-10 border-b-4 border-blue-900 pb-5">
-                        <div class="bg-blue-900 text-white p-4 font-black text-2xl italic">ABA BANKER'S LEAGUE</div>
-                        <div class="text-right">
-                            <h1 class="text-2xl font-black text-blue-900">2026 SEASON</h1>
-                            <p class="text-xs tracking-widest text-gray-500 uppercase">Official Accreditation</p>
-                        </div>
+            currentCoordinator.players.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'page-break p-10 flex flex-col items-center bg-white';
+                card.innerHTML = `
+                    <div class="flex justify-between w-full items-center mb-8 border-b-4 border-blue-900 pb-4">
+                        <div class="bg-blue-900 text-white px-4 py-2 font-black text-xl italic">ABA BANKER'S LEAGUE</div>
+                        <div class="text-right text-blue-900 font-bold">2026 ACCREDITATION</div>
                     </div>
-                    <img class="w-64 h-64 border-8 border-blue-900 object-cover shadow-xl mb-6" src="${player.photo}">
-                    <h2 class="text-4xl font-bold text-gray-800 uppercase text-center">${player.name}</h2>
-                    <p class="text-2xl text-blue-700 font-bold mt-2 uppercase">${currentCoordinator.team}</p>
-                    
-                    <div class="qr-box mt-10 p-4 border-2 border-dashed border-gray-300"></div>
-                    
-                    <div class="grid grid-cols-2 w-full mt-auto border-t-2 border-blue-900 pt-5">
-                        <div>
-                            <p class="text-[10px] text-gray-500 uppercase">Player Registration No</p>
-                            <p class="text-xl font-bold text-blue-900">${player.playerNum}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] text-gray-500 uppercase">Verification Source</p>
-                            <p class="text-xl font-bold text-blue-900">${player.bank}</p>
-                        </div>
+                    <img class="w-56 h-56 border-4 border-blue-900 object-cover mb-4" src="${p.photo}">
+                    <h2 class="text-3xl font-black text-gray-900 uppercase">${p.name}</h2>
+                    <p class="text-xl text-blue-700 font-bold uppercase">${currentCoordinator.team}</p>
+                    <div class="qr-code mt-6"></div>
+                    <div class="mt-auto w-full flex justify-between border-t border-gray-300 pt-4 font-mono text-sm">
+                        <span>REG: ${p.playerNum}</span>
+                        <span>OFFICIAL PLAYER</span>
                     </div>
                 `;
-                
-                // Add QR code to the page
-                const qrContainer = page.querySelector('.qr-box');
-                new QRCode(qrContainer, {
-                    text: `VERIFY:${player.playerNum}:${player.name}`,
-                    width: 120, height: 120
-                });
-
-                printArea.appendChild(page);
-
-                // Add Back Side (Verification ID)
-                const backPage = document.createElement('div');
-                backPage.className = 'page-break p-10 flex flex-col items-center justify-center bg-gray-50';
-                backPage.innerHTML = `
-                    <h3 class="text-gray-400 font-bold mb-4 uppercase tracking-widest text-sm">Staff Verification Document Attached</h3>
-                    <img src="${player.bankIdCard}" class="max-w-full max-h-[700px] border-4 border-white shadow-lg">
-                    <p class="mt-8 text-[10px] text-center text-gray-400">Electronic verification of employment for Aba Banker's League 2026 participation.</p>
-                `;
-                printArea.appendChild(backPage);
-            }
-
-            const opt = {
-                margin: 0,
-                filename: `${currentCoordinator.team}_Squad_IDs.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+                new QRCode(card.querySelector('.qr-code'), { text: p.playerNum, width: 100, height: 100 });
+                container.appendChild(card);
+            });
 
             document.getElementById('id-card-container').style.display = 'block';
-            html2pdf().set(opt).from(printArea).save().then(() => {
+            const opt = { margin: 0, filename: 'squad_ids.pdf', html2canvas: { scale: 2 }, jsPDF: { format: 'a4' } };
+            html2pdf().set(opt).from(container).save().then(() => {
                 document.getElementById('id-card-container').style.display = 'none';
             });
         }
 
-        function toBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        function saveData() {
-            localStorage.setItem('abl_v2_data', JSON.stringify(APP_DATA));
-        }
-
-        function logout() {
-            if(confirm("Exit to main screen?")) location.reload();
-        }
+        function saveData() { localStorage.setItem('abl_v3_data', JSON.stringify(APP_DATA)); }
+        function logout() { if(confirm("Logout?")) location.reload(); }
     </script>
 </body>
 </html>
