@@ -14,62 +14,42 @@
         .neon-text { text-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6; }
         .id-card-print { width: 210mm; height: 297mm; background: white; color: black; padding: 20px; display: none; }
         .page-break { page-break-after: always; }
-        input[type="password"]::-ms-reveal, input[type="password"]::-ms-clear { display: none; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- LOGIN / REGISTRATION SECTION -->
+    <!-- AUTH SECTION -->
     <div id="auth-section" class="flex items-center justify-center min-h-screen p-4">
         <div class="glass p-8 rounded-2xl w-full max-w-md shadow-2xl">
             <h1 class="text-3xl font-extrabold mb-6 text-center text-blue-400 neon-text">TOURNAMENT PORTAL</h1>
             
             <!-- Coordinator Registration Form -->
             <div id="reg-form">
-                <p class="text-gray-400 text-sm mb-4 text-center">New Coordinator? Register your team.</p>
+                <p class="text-gray-400 text-sm mb-4 text-center">Register your team to get started.</p>
                 <div class="space-y-4">
                     <input type="text" id="coord-name" placeholder="Coordinator Full Name" class="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:outline-none focus:border-blue-500">
-                    <input type="text" id="team-name" placeholder="Team Name (Unique)" class="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:outline-none focus:border-blue-500">
+                    <input type="text" id="team-name" placeholder="Team Name (Must be unique)" class="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:outline-none focus:border-blue-500">
                     <div class="space-y-1">
-                        <label class="text-[10px] text-gray-400 ml-1 uppercase">Coordinator Photo</label>
+                        <label class="text-[10px] text-gray-400 ml-1 uppercase">Coordinator Passport Photo</label>
                         <input type="file" id="coord-photo" accept="image/*" class="w-full text-xs text-gray-400 bg-gray-800 p-2 rounded border border-gray-700">
                     </div>
-                    <div class="relative">
-                        <input type="password" id="coord-pass" maxlength="6" placeholder="6-Digit Password" class="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:outline-none focus:border-blue-500">
-                        <button onclick="togglePassword('coord-pass')" class="absolute right-3 top-3.5 text-gray-400 hover:text-blue-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </button>
-                    </div>
-                    <button onclick="registerCoordinator()" class="w-full bg-blue-600 hover:bg-blue-500 p-3 rounded font-bold transition">Create Account & Team</button>
-                    <p class="text-center text-sm mt-4 text-gray-400">Already registered? <button onclick="toggleAuth(false)" class="text-blue-400 font-bold">Login</button></p>
+                    <button onclick="registerCoordinator()" class="w-full bg-blue-600 hover:bg-blue-500 p-3 rounded font-bold transition">Register & Open Dashboard</button>
+                    <p class="text-center text-sm mt-4 text-gray-400">Team already registered? <button onclick="toggleAuth(false)" class="text-blue-400 font-bold">Login</button></p>
                 </div>
             </div>
 
             <!-- Login Form -->
             <div id="login-form" class="hidden">
-                <p class="text-gray-400 text-sm mb-4 text-center">Login to your dashboard</p>
+                <p class="text-gray-400 text-sm mb-4 text-center">Enter your team name to access dashboard</p>
                 <div class="space-y-4">
                     <input type="text" id="login-team" placeholder="Team Name" class="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:outline-none focus:border-green-500">
-                    <div class="relative">
-                        <input type="password" id="login-pass" maxlength="6" placeholder="6-Digit Password" class="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:outline-none focus:border-green-500">
-                        <button onclick="togglePassword('login-pass')" class="absolute right-3 top-3.5 text-gray-400 hover:text-green-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </button>
-                    </div>
                     <div class="flex justify-between items-center text-xs text-blue-400">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="remember-me" class="accent-blue-500"> Remember Me
+                            <input type="checkbox" id="remember-me" class="accent-blue-500"> Remember My Team
                         </label>
-                        <button onclick="forgotPassword()" class="hover:underline">Forgot Password?</button>
                     </div>
-                    <button onclick="login()" class="w-full bg-green-600 hover:bg-green-500 p-3 rounded font-bold transition">Login Now</button>
-                    <p class="text-center text-sm mt-4 text-gray-400">New team? <button onclick="toggleAuth(true)" class="text-blue-400 font-bold">Register</button></p>
+                    <button onclick="login()" class="w-full bg-green-600 hover:bg-green-500 p-3 rounded font-bold transition">Access Dashboard</button>
+                    <p class="text-center text-sm mt-4 text-gray-400">Need to register? <button onclick="toggleAuth(true)" class="text-blue-400 font-bold">Create Team</button></p>
                 </div>
             </div>
         </div>
@@ -79,13 +59,13 @@
     <div id="dashboard" class="hidden min-h-screen">
         <nav class="bg-gray-900 p-4 border-b border-gray-800 flex justify-between items-center sticky top-0 z-50">
             <div class="flex items-center gap-3">
-                <img id="dash-coord-img" class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover bg-gray-700" src="" alt="">
+                <img id="dash-coord-img" class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover bg-gray-700" src="" alt="Coord">
                 <div>
                     <h2 id="dash-team-name" class="font-bold text-blue-400 leading-none"></h2>
                     <p id="dash-coord-name" class="text-[10px] text-gray-400 uppercase tracking-widest mt-1"></p>
                 </div>
             </div>
-            <button onclick="logout()" class="bg-red-500/10 text-red-400 px-4 py-1.5 rounded-lg border border-red-500/30 hover:bg-red-500 hover:text-white transition text-xs font-bold uppercase">Logout</button>
+            <button onclick="logout()" class="bg-red-500/10 text-red-400 px-4 py-1.5 rounded-lg border border-red-500/30 hover:bg-red-500 hover:text-white transition text-xs font-bold uppercase">Exit</button>
         </nav>
 
         <div class="p-4 max-w-6xl mx-auto">
@@ -150,7 +130,7 @@
         </div>
     </div>
 
-    <!-- PRINT TEMPLATE -->
+    <!-- PRINT TEMPLATE (Hidden) -->
     <div id="id-card-container" class="id-card-print">
         <div id="printable-content">
             <div class="page-break relative border-[10px] border-blue-900 h-[1000px] p-10 flex flex-col items-center justify-between bg-white">
@@ -182,22 +162,19 @@
             <div class="h-[1000px] flex flex-col items-center justify-center p-10 bg-gray-50">
                 <h2 class="text-center text-gray-400 mb-10 uppercase tracking-[0.5em] font-bold">Verified Institution Identity</h2>
                 <img id="id-bankcard-img" class="max-w-full max-h-[800px] object-contain border-4 border-white shadow-2xl" src="">
-                <p class="mt-10 text-gray-400 text-xs italic text-center">This document serves as proof of employment verification for the Aba Banker's League 2026 tournament participation.</p>
+                <p class="mt-10 text-gray-400 text-xs italic text-center">This document serves as proof of employment verification for the Aba Banker's League 2026.</p>
             </div>
         </div>
     </div>
 
     <script>
         let currentCoordinator = null;
-        // Data Structure: { coordinators: [{ name, team, abbr, pass, photo, players: [] }] }
-        const APP_DATA = JSON.parse(localStorage.getItem('abl_tourney_data')) || { coordinators: [] };
+        const APP_DATA = JSON.parse(localStorage.getItem('abl_tourney_data_nopass')) || { coordinators: [] };
 
         window.onload = () => {
-            const savedTeam = localStorage.getItem('remembered_team');
-            const savedPass = localStorage.getItem('remembered_pass');
-            if(savedTeam && savedPass) {
+            const savedTeam = localStorage.getItem('remembered_team_name');
+            if(savedTeam) {
                 document.getElementById('login-team').value = savedTeam;
-                document.getElementById('login-pass').value = savedPass;
                 document.getElementById('remember-me').checked = true;
             }
         };
@@ -207,30 +184,19 @@
             document.getElementById('login-form').classList.toggle('hidden', showReg);
         }
 
-        function togglePassword(id) {
-            const el = document.getElementById(id);
-            el.type = el.type === 'password' ? 'text' : 'password';
-        }
-
-        function forgotPassword() {
-            alert("Security Policy: Please contact the Tournament Organizing Committee (Aba Banker's League Admin) to reset your team credentials.");
-        }
-
-        // --- AUTH LOGIC ---
         async function registerCoordinator() {
             const name = document.getElementById('coord-name').value.trim();
             const team = document.getElementById('team-name').value.trim();
-            const pass = document.getElementById('coord-pass').value.trim();
             const photoFile = document.getElementById('coord-photo').files[0];
 
-            if (!name || !team || pass.length !== 6 || !photoFile) {
-                return alert("Required: Full Name, Unique Team Name, 6-Digit Password, and Photo.");
+            if (!name || !team || !photoFile) {
+                return alert("Please provide Coordinator Name, Team Name, and a Passport Photo.");
             }
 
             // Uniqueness Check
             const teamExists = APP_DATA.coordinators.some(c => c.team.toLowerCase() === team.toLowerCase());
             if (teamExists) {
-                return alert("Registration Failed: A team with this name is already registered. Please use a unique name or login.");
+                return alert("This team name is already taken. Please choose a different name.");
             }
 
             try {
@@ -239,15 +205,17 @@
 
                 const newCoord = {
                     id: Date.now(),
-                    name, team, abbr, pass,
+                    name, team, abbr,
                     photo: photoBase64,
                     players: []
                 };
 
                 APP_DATA.coordinators.push(newCoord);
                 saveData();
-                alert("Team Registered Successfully! Please login now.");
-                toggleAuth(false);
+                
+                // Automatic Login after registration
+                currentCoordinator = newCoord;
+                initDashboard();
             } catch (err) {
                 alert("Error processing image. Please try a smaller photo.");
             }
@@ -255,29 +223,23 @@
 
         function login() {
             const team = document.getElementById('login-team').value.trim();
-            const pass = document.getElementById('login-pass').value.trim();
             const remember = document.getElementById('remember-me').checked;
 
-            const found = APP_DATA.coordinators.find(c => 
-                c.team.toLowerCase() === team.toLowerCase() && c.pass === pass
-            );
+            const found = APP_DATA.coordinators.find(c => c.team.toLowerCase() === team.toLowerCase());
 
             if (found) {
                 currentCoordinator = found;
                 if(remember) {
-                    localStorage.setItem('remembered_team', team);
-                    localStorage.setItem('remembered_pass', pass);
+                    localStorage.setItem('remembered_team_name', team);
                 } else {
-                    localStorage.removeItem('remembered_team');
-                    localStorage.removeItem('remembered_pass');
+                    localStorage.removeItem('remembered_team_name');
                 }
                 initDashboard();
             } else {
-                alert("Access Denied: Invalid Team Name or Password.");
+                alert("Team not found. Please register your team first.");
             }
         }
 
-        // --- DASHBOARD ---
         function initDashboard() {
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
@@ -323,6 +285,9 @@
             
             // Reset form
             document.getElementById('p-name').value = '';
+            document.getElementById('p-bank').value = '';
+            document.getElementById('p-phone').value = '';
+            document.getElementById('p-wing').value = '';
             document.getElementById('p-photo').value = '';
             document.getElementById('p-bankid').value = '';
         }
@@ -356,7 +321,6 @@
             }
         }
 
-        // --- PDF GENERATION ---
         async function generateSingleIDById(id) {
             const player = currentCoordinator.players.find(p => p.id === id);
             const container = document.getElementById('id-card-container');
@@ -392,13 +356,12 @@
 
         function bulkPrint() {
             if(currentCoordinator.players.length === 0) return alert("No players registered yet.");
-            alert("Bulk export started. This generates individual files for each player.");
+            alert("Generating all IDs. Please wait for the downloads...");
             currentCoordinator.players.forEach((p, index) => {
-                setTimeout(() => generateSingleIDById(p.id), index * 2000);
+                setTimeout(() => generateSingleIDById(p.id), index * 2500);
             });
         }
 
-        // --- UTILS ---
         function toBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -409,11 +372,11 @@
         }
 
         function saveData() {
-            localStorage.setItem('abl_tourney_data', JSON.stringify(APP_DATA));
+            localStorage.setItem('abl_tourney_data_nopass', JSON.stringify(APP_DATA));
         }
 
         function logout() {
-            if(confirm("Logout from team dashboard?")) location.reload();
+            if(confirm("Are you sure you want to exit the dashboard?")) location.reload();
         }
     </script>
 </body>
