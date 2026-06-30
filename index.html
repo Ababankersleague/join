@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Added html2canvas for Image Download functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap');
         
@@ -16,7 +18,7 @@
         
         /* PDF Layouts */
         .id-card-print { display: none; }
-        .page-break { page-break-after: always; width: 210mm; height: 297mm; position: relative; background: white; color: black; margin: 0 auto; overflow: hidden; }
+        .page-break { page-break-after: always; width: 210mm; min-height: 297mm; position: relative; background: white; color: black; margin: 0 auto; overflow: hidden; }
         
         #toast { transition: transform 0.3s ease-out, opacity 0.3s; }
         .hidden-toast { transform: translateY(100px); opacity: 0; pointer-events: none; }
@@ -177,10 +179,11 @@
     <!-- PREVIEW MODAL -->
     <div id="preview-modal" class="fixed inset-0 bg-black/95 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-md">
         <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden">
-            <div id="id-preview-content" class="bg-gray-100 flex justify-center p-4"></div>
-            <div class="p-6 grid grid-cols-2 gap-4 bg-white">
-                <button onclick="downloadSingleID()" class="bg-sky-600 text-white p-4 rounded-xl font-bold">Download PDF</button>
-                <button onclick="closePreview()" class="bg-gray-100 text-slate-900 p-4 rounded-xl font-bold">Close</button>
+            <div id="id-preview-content" class="bg-gray-100 flex justify-center p-4 overflow-auto"></div>
+            <div class="p-6 grid grid-cols-3 gap-2 bg-white">
+                <button onclick="downloadSingleID('pdf')" class="bg-sky-600 text-white p-3 rounded-xl font-bold text-xs">PDF</button>
+                <button onclick="downloadSingleID('image')" class="bg-emerald-600 text-white p-3 rounded-xl font-bold text-xs">IMAGE</button>
+                <button onclick="closePreview()" class="bg-gray-100 text-slate-900 p-3 rounded-xl font-bold text-xs">CLOSE</button>
             </div>
         </div>
     </div>
@@ -212,7 +215,7 @@
                         const size = 500;
                         canvas.width = size; canvas.height = size;
                         ctx.drawImage(img, 0, 0, size, size);
-                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                        resolve(canvas.toDataURL('image/jpeg', 0.8));
                     };
                 };
                 reader.readAsDataURL(file);
@@ -286,30 +289,36 @@
         // --- PLAYER MGMT ---
         async function registerPlayer() {
             if(currentCoordinator.players.length >= 22) return alert("Limit reached");
+            
             const name = document.getElementById('p-name').value;
             const bank = document.getElementById('p-bank').value;
             const pos = document.getElementById('p-wing').value;
             const pF = document.getElementById('p-photo').files[0];
             const iF = document.getElementById('p-bankid').files[0];
 
-            if(!name || !pF || !iF) return alert("Complete all details");
+            if(!name || !pF || !iF) return alert("Please complete all fields and upload both photos.");
+
+            showToast("Processing Player...");
 
             const player = {
-                id: Date.now(), name, bank, pos,
+                id: Date.now(), 
+                name, 
+                bank, 
+                pos,
                 pNum: `ABL26-${currentCoordinator.team.substring(0,3)}-${(currentCoordinator.players.length+1)}`,
                 photo: await processImg(pF),
                 bankId: await processImg(iF)
             };
 
             currentCoordinator.players.push(player);
-            lastPlayerAdded = player;
             save();
             renderPlayers();
             showToast("Player Accredited!");
             showPreview(player);
             
-            // Reset
+            // Reset Form
             document.getElementById('p-name').value = '';
+            document.getElementById('p-bank').value = '';
             document.getElementById('p-photo').value = '';
             document.getElementById('p-bankid').value = '';
         }
@@ -325,8 +334,12 @@
             }
 
             document.getElementById('empty-state').classList.add('hidden');
-            list.innerHTML = currentCoordinator.players.map(p => `
-                <tr class="hover:bg-white/5 transition">
+            list.innerHTML = '';
+
+            currentCoordinator.players.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-white/5 transition border-b border-white/5";
+                tr.innerHTML = `
                     <td class="py-4 flex items-center gap-3">
                         <img src="${p.photo}" class="w-10 h-10 rounded-full object-cover border border-sky-500">
                         <div>
@@ -336,11 +349,15 @@
                     </td>
                     <td class="py-4 text-xs font-semibold text-sky-400">${p.pos}</td>
                     <td class="py-4 text-right">
-                        <button onclick='showPreview(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="text-sky-500 text-[10px] font-bold mr-4">VIEW</button>
-                        <button onclick="removePlayer(${p.id})" class="text-red-500 text-[10px] font-bold">REMOVE</button>
+                        <button class="view-btn text-sky-500 text-[10px] font-bold mr-4">VIEW</button>
+                        <button class="del-btn text-red-500 text-[10px] font-bold">REMOVE</button>
                     </td>
-                </tr>
-            `).join('');
+                `;
+                
+                tr.querySelector('.view-btn').onclick = () => showPreview(p);
+                tr.querySelector('.del-btn').onclick = () => removePlayer(p.id);
+                list.appendChild(tr);
+            });
         }
 
         function removePlayer(id) {
@@ -354,23 +371,23 @@
 
         // --- ID CARD GENERATION ---
         function getCardHTML(p, isPreview) {
-            const size = isPreview ? '300px' : '210mm';
-            const h = isPreview ? '450px' : '297mm';
+            const size = isPreview ? '320px' : '210mm';
+            const h = isPreview ? 'auto' : '297mm';
             return `
-                <div class="${isPreview ? '' : 'page-break'}" style="width:${size}; background:white; color:black; font-family:sans-serif; border:10px solid #082f49;">
-                    <div style="height:${h}; padding:30px; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                        <h4 style="margin:0; color:#0369a1; font-size:12px;">ABA BANKERS LEAGUE 2026</h4>
-                        <img src="${p.photo}" style="width:150px; height:150px; border-radius:15px; object-fit:cover; margin:20px 0; border:4px solid #0369a1;">
-                        <h2 style="margin:0; text-transform:uppercase; font-size:20px;">${p.name}</h2>
-                        <p style="margin:5px 0; font-weight:bold; color:#0ea5e9;">${currentCoordinator.team}</p>
-                        <p style="background:#0369a1; color:white; padding:5px 15px; border-radius:20px; font-size:10px;">${p.pos}</p>
-                        <div id="qr-${p.id}-${isPreview?'pre':'bulk'}" style="margin-top:auto;"></div>
-                        <p style="font-weight:bold; font-size:14px; margin-top:10px;">${p.pNum}</p>
+                <div id="capture-area-${p.id}" class="${isPreview ? '' : 'page-break'}" style="width:${size}; background:white; color:black; font-family:sans-serif; border:10px solid #082f49;">
+                    <div style="min-height:${h}; padding:30px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                        <h4 style="margin:0; color:#0369a1; font-size:12px; letter-spacing:2px; font-weight:800;">ABA BANKERS LEAGUE 2026</h4>
+                        <img src="${p.photo}" style="width:180px; height:180px; border-radius:15px; object-fit:cover; margin:20px 0; border:4px solid #0369a1;">
+                        <h2 style="margin:0; text-transform:uppercase; font-size:24px; font-weight:800;">${p.name}</h2>
+                        <p style="margin:5px 0; font-weight:bold; color:#0ea5e9; font-size:18px;">${currentCoordinator.team}</p>
+                        <p style="background:#0369a1; color:white; padding:5px 20px; border-radius:20px; font-size:12px; font-weight:bold;">${p.pos}</p>
+                        <div id="qr-${p.id}-${isPreview?'pre':'bulk'}" style="margin: 20px 0;"></div>
+                        <p style="font-weight:bold; font-size:16px; color:#082f49;">${p.pNum}</p>
                     </div>
                     ${isPreview ? '' : `
-                    <div style="height:297mm; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#f1f5f9;">
-                        <p style="font-weight:bold; color:#64748b; margin-bottom:10px;">STAFF VERIFICATION</p>
-                        <img src="${p.bankId}" style="max-width:80%; border-radius:10px;">
+                    <div style="height:297mm; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#f8fafc; border-top: 2px dashed #ccc;">
+                        <p style="font-weight:bold; color:#64748b; margin-bottom:20px;">BANK STAFF VERIFICATION</p>
+                        <img src="${p.bankId}" style="max-width:85%; max-height: 70%; border-radius:10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
                     </div>`}
                 </div>
             `;
@@ -382,32 +399,47 @@
             box.innerHTML = getCardHTML(p, true);
             document.getElementById('preview-modal').classList.remove('hidden');
             setTimeout(() => {
-                new QRCode(document.getElementById(`qr-${p.id}-pre`), { text: p.pNum, width: 80, height: 80 });
-            }, 50);
-        }
-
-        function downloadSingleID() {
-            const p = lastPlayerAdded;
-            const el = document.getElementById('printable-content');
-            el.innerHTML = getCardHTML(p, false);
-            setTimeout(() => {
-                new QRCode(document.getElementById(`qr-${p.id}-bulk`), { text: p.pNum, width: 120, height: 120 });
-                html2pdf().from(el).set({ margin:0, filename:`${p.name}_Accreditation.pdf` }).save().then(() => closePreview());
+                new QRCode(document.getElementById(`qr-${p.id}-pre`), { text: p.pNum, width: 100, height: 100 });
             }, 100);
         }
 
+        async function downloadSingleID(format) {
+            const p = lastPlayerAdded;
+            const el = document.getElementById('printable-content');
+            el.innerHTML = getCardHTML(p, false);
+            
+            // Wait for QR to generate in the hidden printable area
+            setTimeout(async () => {
+                new QRCode(document.getElementById(`qr-${p.id}-bulk`), { text: p.pNum, width: 150, height: 150 });
+                
+                if(format === 'pdf') {
+                    html2pdf().from(el).set({ margin:0, filename:`${p.name}_ABL2026.pdf`, image: { type: 'jpeg', quality: 0.98 } }).save().then(closePreview);
+                } else {
+                    // Image download logic
+                    const area = document.getElementById(`capture-area-${p.id}`);
+                    const canvas = await html2canvas(area, { scale: 2 });
+                    const link = document.createElement('a');
+                    link.download = `${p.name}_ABL2026.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    closePreview();
+                }
+                showToast("Download Started...");
+            }, 300);
+        }
+
         function bulkPrint() {
-            if(currentCoordinator.players.length === 0) return alert("No players");
+            if(currentCoordinator.players.length === 0) return alert("No players to export");
             const el = document.getElementById('printable-content');
             el.innerHTML = currentCoordinator.players.map(p => getCardHTML(p, false)).join('');
             
             setTimeout(() => {
                 currentCoordinator.players.forEach(p => {
-                    new QRCode(document.getElementById(`qr-${p.id}-bulk`), { text: p.pNum, width: 120, height: 120 });
+                    new QRCode(document.getElementById(`qr-${p.id}-bulk`), { text: p.pNum, width: 150, height: 150 });
                 });
-                html2pdf().from(el).set({ margin:0, filename:`${currentCoordinator.team}_Squad_IDs.pdf` }).save();
-                showToast("PDF Generating...");
-            }, 200);
+                html2pdf().from(el).set({ margin:0, filename:`${currentCoordinator.team}_Squad_Accreditation.pdf` }).save();
+                showToast("Generating Squad PDF...");
+            }, 500);
         }
 
         function closePreview() { document.getElementById('preview-modal').classList.add('hidden'); }
