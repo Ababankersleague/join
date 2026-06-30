@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABL 2026 | Official Registration Portal</title>
+    <title>ABL 2026 | Official Accreditation Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -14,21 +14,22 @@
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .accent-text { color: #38bdf8; text-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
         
-        /* Print/PDF Layouts */
+        /* PDF Layouts */
         .id-card-print { display: none; }
         .page-break { page-break-after: always; width: 210mm; height: 297mm; position: relative; background: white; color: black; margin: 0 auto; overflow: hidden; }
         
-        input::file-selector-button {
-            background: #0ea5e9; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;
-        }
-
-        .loader { border-top-color: #38bdf8; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #toast { transition: transform 0.3s ease-out, opacity 0.3s; }
+        .hidden-toast { transform: translateY(100px); opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- AUTH SECTION: REGISTRATION & LOGIN -->
+    <!-- SUCCESS TOAST -->
+    <div id="toast" class="hidden-toast fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold flex items-center gap-3">
+        <span class="text-2xl">✅</span> <span id="toast-msg">Success!</span>
+    </div>
+
+    <!-- AUTH SECTION -->
     <div id="auth-section" class="flex items-center justify-center min-h-screen p-6">
         <div class="glass p-8 rounded-3xl w-full max-w-md shadow-2xl border-t-4 border-t-sky-500">
             <div class="text-center mb-8">
@@ -36,35 +37,24 @@
                 <p class="text-gray-400 text-sm font-semibold uppercase tracking-widest mt-2">Registration Portal</p>
             </div>
             
-            <!-- Registration Form -->
             <div id="reg-form">
                 <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Team Coordinator Name</label>
-                        <input type="text" id="coord-name" placeholder="John Doe" class="w-full p-3 bg-slate-800/50 rounded-xl border border-slate-700 focus:outline-none focus:border-sky-500 transition">
-                    </div>
-                    <div>
-                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Bank / Team Name</label>
-                        <input type="text" id="team-name" placeholder="e.g. Zenith Bank FC" class="w-full p-3 bg-slate-800/50 rounded-xl border border-slate-700 focus:outline-none focus:border-sky-500 transition">
-                    </div>
+                    <input type="text" id="coord-name" placeholder="Coordinator Name" class="w-full p-3 bg-slate-800/50 rounded-xl border border-slate-700 focus:outline-none focus:border-sky-500 transition">
+                    <input type="text" id="team-name" placeholder="Bank / Team Name" class="w-full p-3 bg-slate-800/50 rounded-xl border border-slate-700 focus:outline-none focus:border-sky-500 transition">
                     <div>
                         <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Coordinator Passport</label>
                         <input type="file" id="coord-photo" accept="image/*" class="w-full text-xs text-gray-400 bg-slate-800/50 p-2 rounded-xl border border-slate-700">
                     </div>
-                    <button id="btn-register" onclick="registerCoordinator()" class="w-full bg-sky-600 hover:bg-sky-500 p-4 rounded-xl font-bold transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-sky-900/20">Get Started</button>
-                    <p class="text-center text-sm mt-6 text-gray-400">Team already registered? <button onclick="toggleAuth(false)" class="text-sky-400 font-bold hover:underline">Login</button></p>
+                    <button onclick="registerCoordinator()" class="w-full bg-sky-600 hover:bg-sky-500 p-4 rounded-xl font-bold transition-all transform active:scale-95 shadow-lg shadow-sky-900/20">Get Started</button>
+                    <p class="text-center text-sm mt-6 text-gray-400">Already registered? <button onclick="toggleAuth(false)" class="text-sky-400 font-bold hover:underline">Login</button></p>
                 </div>
             </div>
 
-            <!-- Login Form -->
             <div id="login-form" class="hidden">
                 <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Enter Team Name</label>
-                        <input type="text" id="login-team" placeholder="Exactly as registered" class="w-full p-3 bg-slate-800/50 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500 transition">
-                    </div>
+                    <input type="text" id="login-team" placeholder="Enter Registered Team Name" class="w-full p-3 bg-slate-800/50 rounded-xl border border-slate-700 focus:outline-none focus:border-emerald-500 transition">
                     <button onclick="login()" class="w-full bg-emerald-600 hover:bg-emerald-500 p-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20">Access Dashboard</button>
-                    <p class="text-center text-sm mt-6 text-gray-400"><button onclick="toggleAuth(true)" class="text-sky-400 font-bold hover:underline">Back to Registration</button></p>
+                    <p class="text-center text-sm mt-6 text-gray-400"><button onclick="toggleAuth(true)" class="text-sky-400 font-bold hover:underline">Register New Team</button></p>
                 </div>
             </div>
         </div>
@@ -75,10 +65,7 @@
         <!-- Navbar -->
         <nav class="glass sticky top-0 z-50 px-6 py-4 border-b border-white/5 flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <div class="relative">
-                    <img id="dash-coord-img" class="w-12 h-12 rounded-full border-2 border-sky-500 object-cover bg-slate-700" src="" alt="">
-                    <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-slate-900 rounded-full"></div>
-                </div>
+                <img id="dash-coord-img" class="w-12 h-12 rounded-full border-2 border-sky-500 object-cover bg-slate-700" src="" alt="">
                 <div>
                     <h2 id="dash-team-name" class="font-black text-sky-400 leading-none text-lg"></h2>
                     <p id="dash-coord-name" class="text-[10px] text-gray-400 uppercase mt-1 tracking-wider"></p>
@@ -88,45 +75,41 @@
         </nav>
 
         <div class="p-6 max-w-5xl mx-auto">
-            <!-- Stats & Quick Actions -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-                <button onclick="showView('register')" class="glass p-5 rounded-2xl text-center group hover:border-sky-500/50 transition">
-                    <div class="text-3xl mb-2 group-hover:scale-110 transition">🏃‍♂️</div>
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-sky-400">Add Player</div>
+            <!-- Navigation Tabs -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-10">
+                <button onclick="showView('players')" class="glass p-4 rounded-2xl text-center hover:border-sky-500 transition">
+                    <div class="text-2xl mb-1">📋</div>
+                    <div class="text-[10px] font-bold uppercase text-gray-400">Squad</div>
                 </button>
-                <button onclick="showView('players')" class="glass p-5 rounded-2xl text-center group hover:border-sky-500/50 transition">
-                    <div class="text-3xl mb-2 group-hover:scale-110 transition">📋</div>
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-sky-400">Squad List</div>
+                <button onclick="showView('register')" class="glass p-4 rounded-2xl text-center hover:border-sky-500 transition">
+                    <div class="text-2xl mb-1">➕</div>
+                    <div class="text-[10px] font-bold uppercase text-gray-400">Add Player</div>
                 </button>
-                <button onclick="bulkPrint()" class="glass p-5 rounded-2xl text-center group hover:border-emerald-500/50 transition">
-                    <div class="text-3xl mb-2 group-hover:scale-110 transition">📥</div>
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-emerald-400">Download All</div>
+                <button onclick="bulkPrint()" class="glass p-4 rounded-2xl text-center hover:border-emerald-500 transition">
+                    <div class="text-2xl mb-1">📥</div>
+                    <div class="text-[10px] font-bold uppercase text-gray-400">Export All</div>
                 </button>
-                <button onclick="showView('modalities')" class="glass p-5 rounded-2xl text-center group hover:border-yellow-500/50 transition">
-                    <div class="text-3xl mb-2 group-hover:scale-110 transition">⚖️</div>
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-yellow-400">Rules</div>
+                <button onclick="showView('settings')" class="glass p-4 rounded-2xl text-center hover:border-orange-500 transition">
+                    <div class="text-2xl mb-1">⚙️</div>
+                    <div class="text-[10px] font-bold uppercase text-gray-400">Settings</div>
+                </button>
+                <button onclick="showView('modalities')" class="glass p-4 rounded-2xl text-center hover:border-yellow-500 transition">
+                    <div class="text-2xl mb-1">📜</div>
+                    <div class="text-[10px] font-bold uppercase text-gray-400">Rules</div>
                 </button>
             </div>
 
             <!-- View: Add Player -->
-            <div id="view-register" class="view-section glass p-8 rounded-3xl hidden border-l-4 border-l-sky-500">
+            <div id="view-register" class="view-section glass p-8 rounded-3xl hidden">
                 <div class="flex justify-between items-end mb-8">
-                    <div>
-                        <h3 class="text-2xl font-bold">Player Registration</h3>
-                        <p class="text-gray-400 text-sm">Fill details accurately for accreditation</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-4xl font-black text-sky-500"><span id="player-count">0</span></span>
-                        <span class="text-gray-500 font-bold">/ 22</span>
-                    </div>
+                    <h3 class="text-2xl font-bold">New Player Registration</h3>
+                    <div class="text-right text-gray-400 font-bold"><span id="player-count" class="text-sky-500 text-3xl">0</span>/22</div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-4">
-                        <input type="text" id="p-name" placeholder="Full Name (Surname First)" class="w-full p-4 bg-slate-900 rounded-xl border border-slate-700 focus:border-sky-500 outline-none">
-                        <input type="text" id="p-bank" placeholder="Bank Branch / Dept" class="w-full p-4 bg-slate-900 rounded-xl border border-slate-700 focus:border-sky-500 outline-none">
-                        <select id="p-wing" class="w-full p-4 bg-slate-900 rounded-xl border border-slate-700 focus:border-sky-500 outline-none">
-                            <option value="">Select Position</option>
+                        <input type="text" id="p-name" placeholder="Full Name (Surname First)" class="w-full p-4 bg-slate-900 rounded-xl border border-slate-700 outline-none">
+                        <input type="text" id="p-bank" placeholder="Bank Branch" class="w-full p-4 bg-slate-900 rounded-xl border border-slate-700 outline-none">
+                        <select id="p-wing" class="w-full p-4 bg-slate-900 rounded-xl border border-slate-700 outline-none">
                             <option value="Goalkeeper">Goalkeeper</option>
                             <option value="Defender">Defender</option>
                             <option value="Midfielder">Midfielder</option>
@@ -134,17 +117,13 @@
                         </select>
                     </div>
                     <div class="space-y-4">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Passport Photo</label>
-                            <input type="file" id="p-photo" accept="image/*" class="w-full p-2 bg-slate-900 rounded-xl border border-slate-700 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Bank Staff ID (Image)</label>
-                            <input type="file" id="p-bankid" accept="image/*" class="w-full p-2 bg-slate-900 rounded-xl border border-slate-700 text-xs">
-                        </div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Player Passport</label>
+                        <input type="file" id="p-photo" accept="image/*" class="w-full p-2 bg-slate-900 rounded-xl border border-slate-700 text-xs">
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Bank ID Card Image</label>
+                        <input type="file" id="p-bankid" accept="image/*" class="w-full p-2 bg-slate-900 rounded-xl border border-slate-700 text-xs">
                     </div>
                 </div>
-                <button id="btn-add-player" onclick="registerPlayer()" class="mt-8 w-full bg-sky-600 hover:bg-sky-500 p-4 rounded-2xl font-black text-lg transition-all shadow-xl">REGISTER PLAYER</button>
+                <button onclick="registerPlayer()" class="mt-8 w-full bg-sky-600 hover:bg-sky-500 p-4 rounded-2xl font-black text-lg transition-all">ACCREDIT PLAYER</button>
             </div>
 
             <!-- View: Squad List -->
@@ -154,90 +133,85 @@
                     <table class="w-full text-left">
                         <thead>
                             <tr class="text-gray-500 text-[10px] uppercase tracking-widest border-b border-white/5">
-                                <th class="pb-4">Photo</th>
-                                <th class="pb-4">Player Details</th>
+                                <th class="pb-4">Player</th>
                                 <th class="pb-4">Position</th>
                                 <th class="pb-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="player-list" class="divide-y divide-white/5">
-                            <!-- Players injected here -->
-                        </tbody>
+                        <tbody id="player-list" class="divide-y divide-white/5"></tbody>
                     </table>
                     <div id="empty-state" class="text-center py-20 hidden">
-                        <div class="text-5xl mb-4">🏟️</div>
                         <p class="text-gray-500">No players registered yet.</p>
                     </div>
                 </div>
             </div>
 
+            <!-- View: Settings (EDIT PROFILE) -->
+            <div id="view-settings" class="view-section glass p-8 rounded-3xl hidden">
+                <h3 class="text-2xl font-bold mb-6">Team Settings</h3>
+                <div class="max-w-md space-y-4">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-500">Edit Team Name</label>
+                        <input type="text" id="edit-team-name" class="w-full p-4 bg-slate-900 rounded-xl border border-slate-700 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-gray-500">Edit Coordinator Name</label>
+                        <input type="text" id="edit-coord-name" class="w-full p-4 bg-slate-900 rounded-xl border border-slate-700 outline-none">
+                    </div>
+                    <button onclick="updateSettings()" class="w-full bg-orange-600 hover:bg-orange-500 p-4 rounded-xl font-bold transition">Save Changes</button>
+                </div>
+            </div>
+
             <!-- View: Modalities -->
             <div id="view-modalities" class="view-section glass p-8 rounded-3xl hidden">
-                <h3 class="text-2xl font-extrabold mb-6 accent-text">Tournament Modalities</h3>
-                <div class="space-y-6 text-gray-300 text-sm leading-relaxed">
-                    <div class="p-4 bg-slate-900/50 rounded-xl">
-                        <h4 class="font-bold text-sky-400 mb-2">1. STAFF VERIFICATION</h4>
-                        <p>All players must be active employees of their respective banks. The digital ID generated here must match the Bank Staff ID provided during registration.</p>
-                    </div>
-                    <div class="p-4 bg-slate-900/50 rounded-xl">
-                        <h4 class="font-bold text-sky-400 mb-2">2. SQUAD LIMIT</h4>
-                        <p>A maximum of 22 players is allowed per team. Once reached, the registration portal will lock.</p>
-                    </div>
-                    <div class="p-4 bg-slate-900/50 rounded-xl">
-                        <h4 class="font-bold text-sky-400 mb-2">3. MATCH DAY</h4>
-                        <p>Physical presentation of the ABL 2026 Accreditation Card (Digital or Printed) is mandatory for field entry.</p>
-                    </div>
+                <h3 class="text-2xl font-extrabold mb-6 accent-text">Tournament Rules</h3>
+                <div class="space-y-4 text-gray-300 text-sm">
+                    <p>1. Maximum of 22 players per team.</p>
+                    <p>2. Only bank staff are allowed to participate.</p>
+                    <p>3. Accreditation cards must be presented before every match.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- PREVIEW MODAL -->
-    <div id="preview-modal" class="fixed inset-0 bg-black/90 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-md">
-        <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl transform transition-all">
-            <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
-                <span class="text-xs font-bold uppercase tracking-widest">Digital Accreditation</span>
-                <button onclick="closePreview()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-red-500 transition">&times;</button>
-            </div>
-            <div id="id-preview-content" class="bg-gray-200 p-6 flex justify-center">
-                <!-- Preview Canvas -->
-            </div>
+    <div id="preview-modal" class="fixed inset-0 bg-black/95 hidden z-[100] flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden">
+            <div id="id-preview-content" class="bg-gray-100 flex justify-center p-4"></div>
             <div class="p-6 grid grid-cols-2 gap-4 bg-white">
-                <button onclick="downloadSingleID()" class="bg-sky-600 text-white p-4 rounded-xl font-bold hover:bg-sky-500 transition shadow-lg">Download PDF</button>
-                <button onclick="closePreview()" class="bg-gray-100 text-slate-900 p-4 rounded-xl font-bold hover:bg-gray-200 transition">Close</button>
+                <button onclick="downloadSingleID()" class="bg-sky-600 text-white p-4 rounded-xl font-bold">Download PDF</button>
+                <button onclick="closePreview()" class="bg-gray-100 text-slate-900 p-4 rounded-xl font-bold">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- HIDDEN CONTAINER FOR PDF GENERATION -->
-    <div id="id-card-container" class="id-card-print">
-        <div id="printable-content"></div>
-    </div>
+    <div id="printable-content" class="id-card-print"></div>
 
     <script>
-        // --- DATA MANAGEMENT ---
         let currentCoordinator = null;
-        let lastRegisteredPlayer = null;
-        const LEAGUE_HEADER = "ABA BANKERS LEAGUE 2026 2ND EDITION";
-        const PLACEHOLDER_LOGO = "https://cdn-icons-png.flaticon.com/512/802/802276.png"; 
+        let lastPlayerAdded = null;
+        let APP_DATA = JSON.parse(localStorage.getItem('abl_2026_db')) || { coordinators: [] };
 
-        // Load data from LocalStorage
-        let APP_DATA = JSON.parse(localStorage.getItem('abl_2026_data')) || { coordinators: [] };
+        // --- UTILS ---
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.remove('hidden-toast');
+            setTimeout(() => t.classList.add('hidden-toast'), 3000);
+        }
 
-        // Helper: Convert File to Base64 (Optimized)
-        async function processImage(file) {
-            return new Promise((resolve) => {
+        async function processImg(file) {
+            return new Promise(resolve => {
                 const reader = new FileReader();
-                reader.onload = (e) => {
+                reader.onload = e => {
                     const img = new Image();
                     img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 600;
-                        let width = img.width, height = img.height;
-                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                        canvas.width = width; canvas.height = height;
-                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        const ctx = canvas.getContext('2d');
+                        const size = 500;
+                        canvas.width = size; canvas.height = size;
+                        ctx.drawImage(img, 0, 0, size, size);
                         resolve(canvas.toDataURL('image/jpeg', 0.7));
                     };
                 };
@@ -245,264 +219,199 @@
             });
         }
 
-        // --- AUTH LOGIC ---
-        function toggleAuth(showReg) {
-            document.getElementById('reg-form').classList.toggle('hidden', !showReg);
-            document.getElementById('login-form').classList.toggle('hidden', showReg);
+        // --- AUTH ---
+        function toggleAuth(isReg) {
+            document.getElementById('reg-form').classList.toggle('hidden', !isReg);
+            document.getElementById('login-form').classList.toggle('hidden', isReg);
         }
 
         async function registerCoordinator() {
             const name = document.getElementById('coord-name').value;
             const team = document.getElementById('team-name').value;
             const file = document.getElementById('coord-photo').files[0];
-            
-            if (!name || !team || !file) {
-                alert("Please fill all coordinator fields and upload a photo.");
-                return;
-            }
-            
-            const btn = document.getElementById('btn-register');
-            btn.innerText = "Creating Profile...";
-            btn.disabled = true;
+            if(!name || !team || !file) return alert("Fill all fields");
 
-            const photo = await processImage(file);
             currentCoordinator = { 
-                id: Date.now(), 
-                name, 
-                team: team.toUpperCase(), 
-                photo, 
+                name, team: team.toUpperCase(), 
+                photo: await processImg(file), 
                 players: [] 
             };
-            
             APP_DATA.coordinators.push(currentCoordinator);
-            saveData();
-            initDashboard();
+            save();
+            showToast("Registration Successful!");
+            initDash();
         }
 
         function login() {
-            const teamInput = document.getElementById('login-team').value.trim().toUpperCase();
-            const found = APP_DATA.coordinators.find(c => c.team === teamInput);
-            
-            if (found) {
+            const team = document.getElementById('login-team').value.trim().toUpperCase();
+            const found = APP_DATA.coordinators.find(c => c.team === team);
+            if(found) {
                 currentCoordinator = found;
-                initDashboard();
-            } else {
-                alert("Team not found. Please register first.");
-            }
+                showToast("Welcome Back!");
+                initDash();
+            } else alert("Team not found");
         }
 
-        function initDashboard() {
+        function initDash() {
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('dash-team-name').innerText = currentCoordinator.team;
-            document.getElementById('dash-coord-name').innerText = "Coordinator: " + currentCoordinator.name;
-            document.getElementById('dash-coord-img').src = currentCoordinator.photo;
-            renderPlayers();
+            updateDashUI();
             showView('players');
         }
 
-        // --- NAVIGATION ---
-        function showView(viewId) {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
-            document.getElementById('view-' + viewId).classList.remove('hidden');
+        function updateDashUI() {
+            document.getElementById('dash-team-name').innerText = currentCoordinator.team;
+            document.getElementById('dash-coord-name').innerText = currentCoordinator.name;
+            document.getElementById('dash-coord-img').src = currentCoordinator.photo;
+            document.getElementById('edit-team-name').value = currentCoordinator.team;
+            document.getElementById('edit-coord-name').value = currentCoordinator.name;
+            renderPlayers();
         }
 
-        // --- PLAYER REGISTRATION ---
-        async function registerPlayer() {
-            if (currentCoordinator.players.length >= 22) {
-                alert("Maximum limit of 22 players reached.");
-                return;
-            }
+        // --- NAVIGATION ---
+        function showView(v) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('view-'+v).classList.remove('hidden');
+        }
 
+        // --- SETTINGS ---
+        function updateSettings() {
+            currentCoordinator.team = document.getElementById('edit-team-name').value.toUpperCase();
+            currentCoordinator.name = document.getElementById('edit-coord-name').value;
+            save();
+            updateDashUI();
+            showToast("Profile Updated!");
+        }
+
+        // --- PLAYER MGMT ---
+        async function registerPlayer() {
+            if(currentCoordinator.players.length >= 22) return alert("Limit reached");
             const name = document.getElementById('p-name').value;
             const bank = document.getElementById('p-bank').value;
             const pos = document.getElementById('p-wing').value;
-            const pFile = document.getElementById('p-photo').files[0];
-            const iFile = document.getElementById('p-bankid').files[0];
+            const pF = document.getElementById('p-photo').files[0];
+            const iF = document.getElementById('p-bankid').files[0];
 
-            if(!name || !bank || !pos || !pFile || !iFile) {
-                alert("Please complete all player details.");
-                return;
-            }
+            if(!name || !pF || !iF) return alert("Complete all details");
 
-            const btn = document.getElementById('btn-add-player');
-            btn.innerText = "Processing Accreditation...";
-            btn.classList.add('opacity-50', 'cursor-wait');
-
-            const playerObj = {
-                id: Date.now(),
-                name, bank, pos,
-                pNum: `ABL26-${currentCoordinator.team.substring(0,3)}-${(currentCoordinator.players.length + 1).toString().padStart(3, '0')}`,
-                photo: await processImage(pFile),
-                bankId: await processImage(iFile)
+            const player = {
+                id: Date.now(), name, bank, pos,
+                pNum: `ABL26-${currentCoordinator.team.substring(0,3)}-${(currentCoordinator.players.length+1)}`,
+                photo: await processImg(pF),
+                bankId: await processImg(iF)
             };
 
-            currentCoordinator.players.push(playerObj);
-            lastRegisteredPlayer = playerObj;
-            saveData();
+            currentCoordinator.players.push(player);
+            lastPlayerAdded = player;
+            save();
             renderPlayers();
+            showToast("Player Accredited!");
+            showPreview(player);
             
-            // Clear inputs
-            document.querySelectorAll('#view-register input, #view-register select').forEach(i => i.value = '');
-            btn.innerText = "REGISTER PLAYER";
-            btn.classList.remove('opacity-50', 'cursor-wait');
-
-            showAccreditationPreview(playerObj);
+            // Reset
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-photo').value = '';
+            document.getElementById('p-bankid').value = '';
         }
 
-        // --- ID GENERATION & PDF ---
-        function generateIDHtml(player, isPreview = false) {
-            const cardW = isPreview ? "320px" : "210mm";
-            const cardH = isPreview ? "auto" : "297mm";
-            
-            return `
-                <div class="${isPreview ? 'rounded-2xl shadow-xl' : 'page-break'}" style="width: ${cardW}; background: white; color: black; font-family: 'Inter', sans-serif;">
-                    <!-- FRONT: TOURNAMENT ID -->
-                    <div style="height: ${cardH}; border: 12px solid #0c4a6e; padding: 30px; position: relative; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;">
-                        <p style="font-size: 14px; font-weight: 800; color: #0c4a6e; text-align: center; margin: 0 0 10px 0; font-family: 'Oswald';">${LEAGUE_HEADER}</p>
-                        <div style="width: 60px; height: 2px; background: #0ea5e9; margin-bottom: 20px;"></div>
-                        
-                        <div style="text-align: center; margin-bottom: 25px;">
-                            <img src="${player.photo}" style="width: 180px; height: 180px; object-fit: cover; border: 6px solid #0c4a6e; border-radius: 15px;">
-                        </div>
-
-                        <div style="text-align: center; width: 100%;">
-                            <h2 style="font-size: 24px; font-weight: 900; margin: 0; text-transform: uppercase; color: #0f172a;">${player.name}</h2>
-                            <p style="font-size: 18px; font-weight: 700; color: #0ea5e9; margin: 5px 0;">${currentCoordinator.team}</p>
-                            <div style="display: inline-block; background: #0c4a6e; color: white; padding: 4px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; margin-top: 5px;">
-                                ${player.pos.toUpperCase()}
-                            </div>
-                        </div>
-
-                        <div style="margin-top: auto; width: 100%; display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 20px;">
-                            <div class="qr-box" id="qr-${player.id}-${isPreview?'pre':'prnt'}"></div>
-                            <div style="text-align: right;">
-                                <p style="font-size: 9px; color: #64748b; margin: 0; font-weight: bold;">PLAYER ID</p>
-                                <p style="font-size: 18px; font-weight: 900; color: #0f172a; margin: 0;">${player.pNum}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    ${isPreview ? '' : `
-                    <!-- BACK: BANK ID VERIFICATION -->
-                    <div style="height: 297mm; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; box-sizing: border-box; background: #f8fafc;">
-                        <p style="font-size: 12px; font-weight: bold; color: #64748b; margin-bottom: 20px;">VERIFIED BANK EMPLOYEE IDENTIFICATION</p>
-                        <img src="${player.bankId}" style="max-width: 90%; max-height: 70%; border: 1px solid #cbd5e1; border-radius: 10px; shadow: 0 20px 40px rgba(0,0,0,0.1);">
-                        <p style="margin-top: 30px; font-size: 11px; color: #94a3b8; text-align: center;">This card confirms the player's professional status as provided by the Team Coordinator.</p>
-                    </div>
-                    `}
-                </div>
-            `;
-        }
-
-        function showAccreditationPreview(player) {
-            const previewBox = document.getElementById('id-preview-content');
-            previewBox.innerHTML = generateIDHtml(player, true);
-            document.getElementById('preview-modal').classList.remove('hidden');
-            
-            // Generate QR Code for preview
-            setTimeout(() => {
-                new QRCode(document.getElementById(`qr-${player.id}-pre`), {
-                    text: player.pNum,
-                    width: 70,
-                    height: 70,
-                    colorDark: "#0c4a6e"
-                });
-            }, 100);
-        }
-
-        function downloadSingleID() {
-            const container = document.getElementById('printable-content');
-            container.innerHTML = generateIDHtml(lastRegisteredPlayer, false);
-            
-            setTimeout(() => {
-                new QRCode(document.getElementById(`qr-${lastRegisteredPlayer.id}-prnt`), {
-                    text: lastRegisteredPlayer.pNum,
-                    width: 100,
-                    height: 100
-                });
-
-                const opt = { 
-                    margin: 0, filename: `ABL26_${lastRegisteredPlayer.name}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2 },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-                html2pdf().set(opt).from(container).save().then(() => closePreview());
-            }, 200);
-        }
-
-        function bulkPrint() {
-            if (currentCoordinator.players.length === 0) return alert("No players found.");
-            
-            const container = document.getElementById('printable-content');
-            container.innerHTML = '';
-            
-            currentCoordinator.players.forEach(p => {
-                const wrapper = document.createElement('div');
-                wrapper.innerHTML = generateIDHtml(p, false);
-                container.appendChild(wrapper);
-                
-                new QRCode(document.getElementById(`qr-${p.id}-prnt`), {
-                    text: p.pNum,
-                    width: 100,
-                    height: 100
-                });
-            });
-
-            const opt = { 
-                margin: 0, filename: `${currentCoordinator.team}_ALL_IDS.pdf`,
-                jsPDF: { format: 'a4' }
-            };
-            html2pdf().set(opt).from(container).save();
-        }
-
-        // --- SQUAD MANAGEMENT ---
         function renderPlayers() {
             const list = document.getElementById('player-list');
-            const empty = document.getElementById('empty-state');
             document.getElementById('player-count').innerText = currentCoordinator.players.length;
             
-            if (currentCoordinator.players.length === 0) {
+            if(currentCoordinator.players.length === 0) {
                 list.innerHTML = '';
-                empty.classList.remove('hidden');
+                document.getElementById('empty-state').classList.remove('hidden');
                 return;
             }
 
-            empty.classList.add('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
             list.innerHTML = currentCoordinator.players.map(p => `
-                <tr class="group hover:bg-white/5 transition">
-                    <td class="py-4">
-                        <img src="${p.photo}" class="w-10 h-10 rounded-lg object-cover border border-white/10 group-hover:border-sky-500 transition">
-                    </td>
-                    <td class="py-4">
-                        <div class="font-bold text-slate-200">${p.name}</div>
-                        <div class="text-[10px] text-gray-500 uppercase">${p.pNum} | ${p.bank}</div>
+                <tr class="hover:bg-white/5 transition">
+                    <td class="py-4 flex items-center gap-3">
+                        <img src="${p.photo}" class="w-10 h-10 rounded-full object-cover border border-sky-500">
+                        <div>
+                            <div class="font-bold">${p.name}</div>
+                            <div class="text-[9px] text-gray-500">${p.pNum}</div>
+                        </div>
                     </td>
                     <td class="py-4 text-xs font-semibold text-sky-400">${p.pos}</td>
-                    <td class="py-4 text-right space-x-4">
-                        <button onclick='viewPlayerID(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="text-sky-500 font-bold text-[10px] hover:underline">VIEW ID</button>
-                        <button onclick="deletePlayer(${p.id})" class="text-red-500 font-bold text-[10px] hover:underline">REMOVE</button>
+                    <td class="py-4 text-right">
+                        <button onclick='showPreview(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="text-sky-500 text-[10px] font-bold mr-4">VIEW</button>
+                        <button onclick="removePlayer(${p.id})" class="text-red-500 text-[10px] font-bold">REMOVE</button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        function viewPlayerID(player) {
-            lastRegisteredPlayer = player;
-            showAccreditationPreview(player);
-        }
-
-        function deletePlayer(id) {
-            if(confirm("Permanently remove this player?")) {
+        function removePlayer(id) {
+            if(confirm("Remove this player permanently?")) {
                 currentCoordinator.players = currentCoordinator.players.filter(p => p.id !== id);
-                saveData(); renderPlayers();
+                save();
+                renderPlayers();
+                showToast("Player Removed");
             }
         }
 
-        // --- UTILS ---
+        // --- ID CARD GENERATION ---
+        function getCardHTML(p, isPreview) {
+            const size = isPreview ? '300px' : '210mm';
+            const h = isPreview ? '450px' : '297mm';
+            return `
+                <div class="${isPreview ? '' : 'page-break'}" style="width:${size}; background:white; color:black; font-family:sans-serif; border:10px solid #082f49;">
+                    <div style="height:${h}; padding:30px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                        <h4 style="margin:0; color:#0369a1; font-size:12px;">ABA BANKERS LEAGUE 2026</h4>
+                        <img src="${p.photo}" style="width:150px; height:150px; border-radius:15px; object-fit:cover; margin:20px 0; border:4px solid #0369a1;">
+                        <h2 style="margin:0; text-transform:uppercase; font-size:20px;">${p.name}</h2>
+                        <p style="margin:5px 0; font-weight:bold; color:#0ea5e9;">${currentCoordinator.team}</p>
+                        <p style="background:#0369a1; color:white; padding:5px 15px; border-radius:20px; font-size:10px;">${p.pos}</p>
+                        <div id="qr-${p.id}-${isPreview?'pre':'bulk'}" style="margin-top:auto;"></div>
+                        <p style="font-weight:bold; font-size:14px; margin-top:10px;">${p.pNum}</p>
+                    </div>
+                    ${isPreview ? '' : `
+                    <div style="height:297mm; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#f1f5f9;">
+                        <p style="font-weight:bold; color:#64748b; margin-bottom:10px;">STAFF VERIFICATION</p>
+                        <img src="${p.bankId}" style="max-width:80%; border-radius:10px;">
+                    </div>`}
+                </div>
+            `;
+        }
+
+        function showPreview(p) {
+            lastPlayerAdded = p;
+            const box = document.getElementById('id-preview-content');
+            box.innerHTML = getCardHTML(p, true);
+            document.getElementById('preview-modal').classList.remove('hidden');
+            setTimeout(() => {
+                new QRCode(document.getElementById(`qr-${p.id}-pre`), { text: p.pNum, width: 80, height: 80 });
+            }, 50);
+        }
+
+        function downloadSingleID() {
+            const p = lastPlayerAdded;
+            const el = document.getElementById('printable-content');
+            el.innerHTML = getCardHTML(p, false);
+            setTimeout(() => {
+                new QRCode(document.getElementById(`qr-${p.id}-bulk`), { text: p.pNum, width: 120, height: 120 });
+                html2pdf().from(el).set({ margin:0, filename:`${p.name}_Accreditation.pdf` }).save().then(() => closePreview());
+            }, 100);
+        }
+
+        function bulkPrint() {
+            if(currentCoordinator.players.length === 0) return alert("No players");
+            const el = document.getElementById('printable-content');
+            el.innerHTML = currentCoordinator.players.map(p => getCardHTML(p, false)).join('');
+            
+            setTimeout(() => {
+                currentCoordinator.players.forEach(p => {
+                    new QRCode(document.getElementById(`qr-${p.id}-bulk`), { text: p.pNum, width: 120, height: 120 });
+                });
+                html2pdf().from(el).set({ margin:0, filename:`${currentCoordinator.team}_Squad_IDs.pdf` }).save();
+                showToast("PDF Generating...");
+            }, 200);
+        }
+
         function closePreview() { document.getElementById('preview-modal').classList.add('hidden'); }
-        function saveData() { localStorage.setItem('abl_2026_data', JSON.stringify(APP_DATA)); }
+        function save() { localStorage.setItem('abl_2026_db', JSON.stringify(APP_DATA)); }
         function logout() { location.reload(); }
     </script>
 </body>
