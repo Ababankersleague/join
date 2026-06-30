@@ -142,7 +142,7 @@
                     <p><b>1. Staff Verification:</b> Only verified bank employees are eligible.</p>
                     <p><b>2. ID Cards:</b> Digital ID generated here must be presented at the matches.</p>
                     <p><b>3. No. Of Players :</b> Only 22 players are to be registered for each bank.</p>
-                    <p><b>2. Only Bank Players Approved:</b> Only bank players are allowed to play.</p>
+                    <p><b>4. Eligibility:</b> Only bank players are allowed to play.</p>
                 </div>
             </div>
         </div>
@@ -174,8 +174,8 @@
         // --- CONFIG & DATA ---
         let currentCoordinator = null;
         let lastRegisteredPlayer = null;
-        // PLACE YOUR LOGO URL HERE
-        const LOGO_URL = ABA BANKERS LEAGUE 2026 2ND EDITION // Update this to your image link
+        const LEAGUE_TITLE = "ABA BANKERS LEAGUE 2026 2ND EDITION";
+        const LOGO_URL = "https://cdn-icons-png.flaticon.com/512/802/802276.png"; // Placeholder Logo
         let APP_DATA = JSON.parse(localStorage.getItem('abl_v4_data')) || { coordinators: [] };
 
         async function processImage(file) {
@@ -263,7 +263,6 @@
             saveData();
             renderPlayers();
             
-            // Clear inputs
             document.querySelectorAll('#view-register input, #view-register select').forEach(i => i.value = '');
             btn.innerText = "Register & Generate ID Card";
             btn.disabled = false;
@@ -280,45 +279,47 @@
 
         function generateIDHtml(player, isPreview = false) {
             const sizeClasses = isPreview ? "w-[300px] bg-white text-black shadow-lg" : "page-break";
-            const teamColor = "#1e3a8a"; // Deep Blue
+            const teamColor = "#1e3a8a"; 
 
             return `
-                <div class="${sizeClasses}" style="font-family: Arial, sans-serif;">
+                <div class="${sizeClasses}" style="font-family: 'Poppins', sans-serif;">
                     <!-- PAGE 1: TOURNAMENT ID -->
-                    <div style="height: ${isPreview ? 'auto' : '297mm'}; padding: 40px; border: 15px solid ${teamColor}; position: relative;">
+                    <div style="height: ${isPreview ? 'auto' : '297mm'}; padding: 40px; border: 15px solid ${teamColor}; position: relative; box-sizing: border-box;">
                         <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="${LOGO_URL}" style="width: 150px; margin-bottom: 10px;">
-                            <h1 style="margin: 0; color: ${teamColor}; font-size: 28px; font-weight: 900;">ACCREDITATION CARD</h1>
-                            <div style="background: ${teamColor}; color: white; padding: 5px; font-weight: bold; margin-top: 5px;">2026 OFFICIAL PLAYER</div>
+                            <p style="font-size: 14px; font-weight: bold; color: ${teamColor}; margin: 0; letter-spacing: 1px;">${LEAGUE_TITLE}</p>
+                            <img src="${LOGO_URL}" style="width: 100px; margin: 10px auto;">
+                            <h1 style="margin: 0; color: ${teamColor}; font-size: 24px; font-weight: 900;">ACCREDITATION CARD</h1>
+                            <div style="background: ${teamColor}; color: white; padding: 5px; font-weight: bold; margin-top: 5px; font-size: 12px;">OFFICIAL PLAYER 2026</div>
                         </div>
 
                         <div style="text-align: center;">
-                            <img src="${player.photo}" style="width: 220px; height: 220px; border: 5px solid ${teamColor}; object-cover; margin: 0 auto 20px;">
-                            <h2 style="font-size: 32px; margin: 0; color: #111;">${player.name.toUpperCase()}</h2>
+                            <img src="${player.photo}" style="width: 220px; height: 220px; border: 5px solid ${teamColor}; border-radius: 10px; object-fit: cover; margin: 0 auto 20px;">
+                            <h2 style="font-size: 28px; margin: 0; color: #111; font-weight: 800;">${player.name.toUpperCase()}</h2>
                             <p style="font-size: 20px; font-weight: bold; color: ${teamColor}; margin: 5px 0;">${currentCoordinator.team}</p>
-                            <p style="font-size: 16px; color: #666;">${player.pos} | ${player.bank}</p>
+                            <p style="font-size: 16px; color: #666; font-weight: 600;">${player.pos} | ${player.bank}</p>
                         </div>
 
                         <div style="margin-top: 40px; display: flex; justify-content: space-around; align-items: center;">
                             <div class="qr-box"></div>
                             <div style="text-align: right;">
-                                <p style="font-size: 12px; color: #999; margin: 0;">PLAYER REGISTRATION NO.</p>
-                                <p style="font-size: 24px; font-weight: bold; margin: 0;">${player.pNum}</p>
+                                <p style="font-size: 10px; color: #999; margin: 0;">REGISTRATION NO.</p>
+                                <p style="font-size: 22px; font-weight: bold; margin: 0; color: #111;">${player.pNum}</p>
                             </div>
                         </div>
 
-                        <div style="position: absolute; bottom: 40px; left: 40px; right: 40px; border-top: 2px dashed #ccc; padding-top: 10px; text-align: center; font-size: 12px; color: #777;">
-                            This card remains the property of ABA Banker's League. 
-                            Unauthorized use is strictly prohibited.
+                        <div style="position: absolute; bottom: 40px; left: 40px; right: 40px; border-top: 2px dashed #ccc; padding-top: 10px; text-align: center; font-size: 11px; color: #777;">
+                            This card is a property of the Aba Banker's League. 
+                            Verification required at every match entry.
                         </div>
                     </div>
 
                     ${isPreview ? '' : `
                     <!-- PAGE 2: BANK ID -->
-                    <div style="height: 297mm; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px;">
-                        <h2 style="color: #666; margin-bottom: 20px;">VERIFIED BANK STAFF ID</h2>
-                        <img src="${player.bankId}" style="max-width: 90%; max-height: 80%; border: 2px solid #ddd; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                        <p style="margin-top: 20px; font-size: 14px; color: #999;">End of Accreditation Document</p>
+                    <div style="height: 297mm; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; box-sizing: border-box;">
+                        <p style="font-size: 12px; font-weight: bold; color: #999; margin-bottom: 10px;">${LEAGUE_TITLE}</p>
+                        <h2 style="color: #666; margin-bottom: 20px; font-weight: 600;">VERIFIED EMPLOYEE ID</h2>
+                        <img src="${player.bankId}" style="max-width: 90%; max-height: 70%; border: 2px solid #ddd; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 10px;">
+                        <p style="margin-top: 20px; font-size: 14px; color: #999;">Scan QR on front for digital verification</p>
                     </div>
                     `}
                 </div>
@@ -328,18 +329,14 @@
         function downloadSingleID() {
             const container = document.getElementById('printable-content');
             container.innerHTML = generateIDHtml(lastRegisteredPlayer, false);
-            
-            // Generate QR for the print version
             new QRCode(container.querySelector(".qr-box"), { text: lastRegisteredPlayer.pNum, width: 120, height: 120 });
             
             const opt = { 
-                margin: 0, 
-                filename: `ID_${lastRegisteredPlayer.name}.pdf`,
+                margin: 0, filename: `ID_${lastRegisteredPlayer.name}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            
             html2pdf().set(opt).from(container).save().then(() => closePreview());
         }
 
@@ -347,15 +344,13 @@
             if (currentCoordinator.players.length === 0) return alert("No players to print.");
             const container = document.getElementById('printable-content');
             container.innerHTML = '';
-
             currentCoordinator.players.forEach(p => {
                 const div = document.createElement('div');
                 div.innerHTML = generateIDHtml(p, false);
                 container.appendChild(div);
                 new QRCode(div.querySelector(".qr-box"), { text: p.pNum, width: 120, height: 120 });
             });
-
-            html2pdf().set({ margin: 0, filename: 'All_Squad_IDs.pdf', jsPDF: { format: 'a4' } }).from(container).save();
+            html2pdf().set({ margin: 0, filename: 'Full_Squad_Accreditations.pdf', jsPDF: { format: 'a4' } }).from(container).save();
         }
 
         function renderPlayers() {
