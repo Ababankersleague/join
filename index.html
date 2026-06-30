@@ -111,7 +111,7 @@
                         <input type="file" id="p-photo" accept="image/*" class="w-full text-xs bg-gray-800 p-2 rounded">
                     </div>
                     <div class="space-y-1">
-                        <label class="text-xs text-gray-400 uppercase font-bold">Bank Staff ID Card</label>
+                        <label class="text-xs text-gray-400 uppercase font-bold">Bank ID Card</label>
                         <input type="file" id="p-bankid" accept="image/*" class="w-full text-xs bg-gray-800 p-2 rounded">
                     </div>
                 </div>
@@ -140,7 +140,9 @@
                 <h3 class="text-2xl font-bold mb-6 text-blue-400">Tournament Rules</h3>
                 <div class="text-gray-300 space-y-4 text-sm">
                     <p><b>1. Staff Verification:</b> Only verified bank employees are eligible.</p>
-                    <p><b>2. ID Cards:</b> Digital ID generated here must be presented at the gate.</p>
+                    <p><b>2. ID Cards:</b> Digital ID generated here must be presented at the matches.</p>
+                    <p><b>3. No. Of Players :</b> Only 22 players are to be registered for each bank.</p>
+                    <p><b>2. Only Bank Players Approved:</b> Only bank players are allowed to play.</p>
                 </div>
             </div>
         </div>
@@ -173,7 +175,7 @@
         let currentCoordinator = null;
         let lastRegisteredPlayer = null;
         // PLACE YOUR LOGO URL HERE
-        const LOGO_URL = 'https://i.ibb.co/LkhYqjP/aba-logo.png'; // Update this to your image link
+        const LOGO_URL = ABA BANKERS LEAGUE 2026 2ND EDITION // Update this to your image link
         let APP_DATA = JSON.parse(localStorage.getItem('abl_v4_data')) || { coordinators: [] };
 
         async function processImage(file) {
